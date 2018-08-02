@@ -353,21 +353,21 @@ import kotlinx.android.synthetic.main.activity_login.*
         fun saveUserInfo() {
             val username = createAccountView.findViewById<AutoCompleteTextView>(R.id.email_in)
             val name = createAccountView.findViewById<AutoCompleteTextView>(R.id.name_in)
+            /*
             val streetAddress = createAccountView.findViewById<AutoCompleteTextView>(R.id.address_in)
             val cityAndState = createAccountView.findViewById<AutoCompleteTextView>(R.id.city_in)
             val zip = createAccountView.findViewById<AutoCompleteTextView>(R.id.zip_in)
+            */
             val phone = createAccountView.findViewById<AutoCompleteTextView>(R.id.phone_in)
 
             val userRef = database.getReference("user/" + mAuth.currentUser?.uid)
-            userRef.setValue(hashMapOf<String, String>(
-                    "name" to name?.text.toString(),
-                    "email" to username?.text.toString(),
-                    "street_address" to streetAddress.text.toString(),
-                    "city_state" to cityAndState.text.toString(),
-                    "zip" to zip.text.toString(),
-                    "phone" to phone.text.toString(),
-                    "finished_setup" to "false"
-            ))
+
+            val user = User()
+            user.emailAddress = username.text.toString()
+            user.name = name.text.toString()
+            user.phone = phone.text.toString()
+
+            userRef.setValue(user)
         }
 
         fun loginUser() {
@@ -402,14 +402,10 @@ import kotlinx.android.synthetic.main.activity_login.*
                     if (dataSnapshot != null
                             && dataSnapshot.exists()
                             && dataSnapshot.hasChildren()) {
-                        if (dataSnapshot.hasChild("orders")) {
-                            //startMainActivity()
-                            Log.i("Setup", "User has orders")
-                            startMainActivity()
-                            return
-                        }
+                        startMainActivity()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "User not found", Toast.LENGTH_SHORT).show()
                     }
-                    startMainActivity()
                 }
 
 

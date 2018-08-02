@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Washboard</string>
+    <string name="title_activity_login">Login Activity</string>
+    <string name="nav_header_desc">Nav Header</string>
+    <string name="nav_header_title">Nav Header Title</string>
+    <string name="nav_header_subtitle">Nav Header Subtitle</string>
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
