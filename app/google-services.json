@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "205209628080",
+    "firebase_url": "https://washboard-4b183.firebaseio.com",
+    "project_id": "washboard-4b183",
+    "storage_bucket": "washboard-4b183.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205209628080:android:d0d5e7e421907b3d",
+        "android_client_info": {
+          "package_name": "com.davidparkeredwards.washboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "205209628080-rj9l7bbqlns7pa7jsrfre3e4hjuicosf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.davidparkeredwards.washboard",
+            "certificate_hash": "1ae0c25db9729b108734dde3e1f2e0f75b5526b3"
+          }
+        },
+        {
+          "client_id": "205209628080-pqvpqrjt5ffhj7u6didfac5t8nkgigt8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.davidparkeredwards.washboard",
+            "certificate_hash": "1b644c6da462c6baff657a7d461469c2c8bd00c4"
+          }
+        },
+        {
+          "client_id": "205209628080-60bae3nqbm9d1hipau4dattd0g9tne0c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJpiwYuaywjiptQQuZROj8usYI7k6cF1U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "205209628080-60bae3nqbm9d1hipau4dattd0g9tne0c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,147 @@
+<resources>
+    <string name="app_name">Washboard</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_name">Name</string>
+    <string name="prompt_address">Street address</string>
+    <string name="prompt_pickup_address">Pickup address</string>
+    <string name="prompt_city">City and state</string>
+    <string name="prompt_zip">Zip</string>
+    <string name="prompt_phone">Phone</string>
+    <string name="update">Update</string>
+    <string name="service_unavailable_zip">Service is not yet available in your area.
+        Please choose another zip code. We will let you know when we come to your area.</string>
+
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="create_account">Create account</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_setup">SetupActivity</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Intro Text -->
+    <string name="intro_text">Welcome to Washboard! We are going to save you a ton of time every week. Please watch the video below to see how it works.</string>
+    <string name="details">Details</string>
+    <string name="options_intro">Which package works best for you?</string>
+    <string name="option1">
+        p/load **
+        \n- one time pickup</string>
+    <string name="option2">
+        p/load (recommended) **
+        \n- repeating pickup every week
+        \n- no commitment
+        \n- no minimum order
+        \n- no cancellation fees *
+        \n- select your preferred providers
+        \n- 2 free laundry bags!</string>
+    <string name="option3">
+        p/load **
+        \n- repeating pickup every week
+        \n- $80 minimum order
+        \n- $10 cancellation fee *</string>
+    <string name="footnotes">
+        *If cancelled before pickup time. If not cancelled and no laundry is available a $5 charge will be incurred to cover the provider's transport expenses to your residence
+        \n**Before any add-on charges
+    </string>
+    <string name="windows_explanation">
+        Please select pickup/dropoff windows. Please note: laundry must be available at the beginning of the window and accessible until the end of the window. Provider may arrive between any of these times. It is fine if the laundry is unattended.
+    </string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+
+    <string name="monday_short">Mon</string>
+    <string name="tuesday_short">Tue</string>
+    <string name="wednesday_short">Wed</string>
+    <string name="thursday_short">Thu</string>
+    <string name="friday_short">Fri</string>
+    <string name="saturday_short">Sat</string>
+    <string name="sunday_short">Sun</string>
+
+    <string name="pickup">Pick-up</string>
+    <string name="dropoff">Drop-off</string>
+    <string name="sort_instructions">
+        Please place clothes in 13 gallon bags (Washboard bags or 13 gallon plastic kitchen bags).
+        Each bag will be washed as an individual load, so please sort with like colors as desired.
+        \n
+        \n
+Place delicates and hang dry items in a separate bag inside the 13 gallon bag.
+        These will be given special care and hung dry instead of placed in the dryer, then folded and returned with the rest of the load.
+        Hang dry and delicates will accrue an additional charge of $1 each.
+        \n
+        \n
+All laundry is washed with Tide and OxyClean.
+        Fabric softener will be added as requested (not recommended for towels).
+        Fabric softener can not be added to only part of a load, please separate into separate bags as necessary.
+        We use "x" fabric softener.
+        \n
+        \n
+All laundry not set aside as delicate or hang dry will be dried on medium heat then folded.
+        \n
+        \n
+        If the following items apply please specify if instruction applies to all bags, or only specific ones, and any additional details.
+    </string>
+    <string name="soiled">Load contains heavily soiled items:</string>
+    <string name="cold">Wash in cold water only (Good for mixed colors to avoid bleeding):</string>
+    <string name="softener">Add fabric softener (Not recommended for towels as it can reduce absorbency):</string>
+    <string name="additional_instructions_text">Additional instructions, including pickup instructions, where the bags will be located, building access codes, etc:</string>
+    <string name="additional_instructions_hint">Additional and pickup instructions</string>
+    <string name="payment_instructions">Each bag of laundry is $20, and each hang dry/delicate item is an additional $1. Your credit card will be authorized for $20 at this time, but not charged until after the order is complete and totaled and you will be emailed a receipt. </string>
+
+    <string name="title_pickup">Next Pickup</string>
+    <string name="title_account">Account</string>
+    <string name="title_orders">Orders</string>
+    <string name="title_order_history">History</string>
+
+    <string name="is_soiled">Contains heavily soiled items: </string>
+    <string name="is_softener">Requires fabric softener: </string>
+    <string name="is_cold">Requires cold wash: </string>
+
+    <string name="orders">Orders</string>
+    <string name="no_orders_available">No orders available</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="paused">Paused</string>
+    <string name="active">Active</string>
+    <string name="today">Today</string>
+    <string name="next_pickup_is">Next pickup is</string>
+    <string name="yes">yes</string>
+    <string name="order_notes">Order notes: </string>
+    <string name="order_id">Order ID: </string>
+    <string name="save_order">Save Order</string>
+    <string name="order_is_paused">Order is paused. Please press play to continue to receive pickups.</string>
+    <string name="confirmation_text">You\'re all set! Continue on to see your order and edit if needed.</string>
+
+    <string name="edit_account">Edit Account</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="reset_button">Reset Password</string>
+    <string name="logout">Logout</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="reset_password_text">Please enter your email address. You will receive an email with directions to reset your password.</string>
+
+    <string name="reset_email_sent">Reset email sent. Please check your email account.</string>
+    <string name="account_not_found">Account not found. Please check address or create a new account.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_order">Add New Order</string>
+    <string name="delete_order">Delete Order</string>
+    <string name="delete_order_confirmation">This action cannot be undone.
+        If you need to skip this order for a period of time press pause so you can reactivate it at your convenience.
+        Are you sure you want to proceed?</string>
+</resources>
