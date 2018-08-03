@@ -36,6 +36,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
+    implementation 'com.stripe:stripe-android:6.1.2'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

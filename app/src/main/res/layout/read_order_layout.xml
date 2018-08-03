@@ -15,7 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_menu_send"
-        android:id="@+id/pause_button"/>
+        android:id="@+id/pause_button"
+        android:onClick="pauseOrder"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

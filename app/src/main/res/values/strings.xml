@@ -13,9 +13,9 @@
     <string name="prompt_password">Password</string>
     <string name="prompt_name">Name</string>
     <string name="prompt_address">Street address</string>
-    <string name="prompt_pickup_address">Pickup address</string>
+    <string name="prompt_pickup_address">Pickup address and city</string>
     <string name="prompt_city">City and state</string>
-    <string name="prompt_zip">Zip</string>
+    <string name="prompt_zip">Pickup Zip Code</string>
     <string name="prompt_phone">Phone</string>
     <string name="update">Update</string>
     <string name="service_unavailable_zip">Service is not yet available in your area.
@@ -63,7 +63,7 @@
         \n**Before any add-on charges
     </string>
     <string name="windows_explanation">
-        Please select pickup/dropoff windows. Please note: laundry must be available at the beginning of the window and accessible until the end of the window. Provider may arrive between any of these times. It is fine if the laundry is unattended.
+        Please select pickup/dropoff windows.
     </string>
     <string name="monday">Monday</string>
     <string name="tuesday">Tuesday</string>
@@ -124,7 +124,7 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="no_orders_available">No orders available</string>
     <string name="edit">Edit</string>
     <string name="cancel">Cancel</string>
-    <string name="paused">Paused</string>
+    <string name="paused">Your order is paused. Click to resume pickups.</string>
     <string name="active">Active</string>
     <string name="today">Today</string>
     <string name="next_pickup_is">Next pickup is</string>
@@ -151,4 +151,6 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="delete_order_confirmation">This action cannot be undone.
         If you need to skip this order for a period of time press pause so you can reactivate it at your convenience.
         Are you sure you want to proceed?</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
 </resources>
