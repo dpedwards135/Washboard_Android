@@ -11,14 +11,23 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/read_order_container">
+        android:id="@+id/read_order_container"
+        android:visibility="gone">
         <include layout="@layout/read_order_layout"/>
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/edit_order_container">
+        android:id="@+id/edit_order_container"
+        android:visibility="gone">
         <include layout="@layout/edit_order_layout"/>
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/account_info_container"
+        android:visibility="gone">
+        <include layout="@layout/account_layout"/>
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

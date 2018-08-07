@@ -111,7 +111,7 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="additional_instructions_hint">Additional and pickup instructions</string>
     <string name="payment_instructions">Each bag of laundry is $20, and each hang dry/delicate item is an additional $1. Your credit card will be authorized for $20 at this time, but not charged until after the order is complete and totaled and you will be emailed a receipt. </string>
 
-    <string name="title_pickup">Next Pickup</string>
+    <string name="title_pickup">My Laundry Day</string>
     <string name="title_account">Account</string>
     <string name="title_orders">Orders</string>
     <string name="title_order_history">History</string>
@@ -153,4 +153,17 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
         Are you sure you want to proceed?</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
+    <string name="in">in</string>
+    <string name="days">days</string>
+    <string name="day">day</string>
+    <string name="pricing">Pricing: </string>
+    <string name="standard">Per load: </string>
+    <string name="add_on">Per delicate, hang dry, or stained item: </string>
+    <string name="title_activity_wbnavigation">WBNavigationActivity</string>
+    <string name="account_details">Account Details</string>
+    <string name="my_laundry_day">My Laundry Day</string>
+    <string name="provider">Provider</string>
+    <string name="account">Account</string>
+    <string name="order_history">Order History</string>
+    <string name="washboard">Washboard</string>
 </resources>

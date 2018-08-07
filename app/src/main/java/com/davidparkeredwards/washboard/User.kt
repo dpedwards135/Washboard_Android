@@ -7,4 +7,5 @@ class User {
     var phone = ""
     var order = Order()
     var stripeId = ""
+    var last4 = ""
 }

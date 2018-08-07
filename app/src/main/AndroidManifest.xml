@@ -27,7 +27,17 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name=".WBNavigationActivity"
+            android:label="@string/title_activity_wbnavigation"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".AccountActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".OrderHistoryActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".ProviderActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

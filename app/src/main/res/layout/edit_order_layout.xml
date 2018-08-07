@@ -85,6 +85,14 @@
             android:text="@string/save_order"
             android:onClick="saveOrder"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:onClick="toggleMode"
+            android:visibility="gone"
+            android:id="@+id/cancel_button"/>
+
     </LinearLayout>
 
 

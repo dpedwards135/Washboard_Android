@@ -14,12 +14,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import com.crashlytics.android.Crashlytics
 import com.davidparkeredwards.washboard.R.string.orders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.stripe.android.SourceCallback
+import com.stripe.android.Stripe
+import com.stripe.android.TokenCallback
+import com.stripe.android.model.Source
+import com.stripe.android.model.SourceParams
+import com.stripe.android.model.Token
+import com.stripe.android.view.CardInputWidget
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.read_order_layout.*
@@ -28,101 +36,15 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.collections.HashMap
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : WBNavigationActivity() {
 
-    val mAuth = FirebaseAuth.getInstance()
-    val db = FirebaseDatabase.getInstance()
+
     var editMode = false
-    val user = User()
     var zipInfo = ZipInfo()
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
-
-
-        getUserInfo()
-
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        nav_view.setNavigationItemSelectedListener(this)
-
-        fab.setOnClickListener { view ->
-            toggleMode()
-        }
-
-
-
-
-    }
-
-    override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
-            }
-        }
-
-        drawer_layout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    fun logout() {
-        var auth = FirebaseAuth.getInstance()
-        auth.signOut()
-
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish()
-    }
-
-    fun setUpUi() {
+    override fun setUpUi() {
+        super.setUpUi()
         if(!editMode && user.order.window.pickupDay != 100) {
             findViewById<FrameLayout>(R.id.read_order_container).visibility = View.VISIBLE
             findViewById<FrameLayout>(R.id.edit_order_container).visibility = View.GONE
@@ -137,11 +59,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     fun setupEditView() {
 
         Log.i("Main", "setUpEditView")
-        fab.setImageDrawable(resources.getDrawable(R.drawable.abc_btn_check_material))
-        fab2.visibility = View.VISIBLE
 
         val zipView = findViewById<AutoCompleteTextView>(R.id.zip_in)
-        zipView.setText(user.order.zip)
+
         zipView.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 if(p0.toString().count() == 5) {
@@ -153,11 +73,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
         })
+        if(zipView.text.count() == 0) zipView.setText(user.order.zip)
     }
 
     fun displayOrderInput(boolean: Boolean) {
         if(!boolean) {
             findViewById<LinearLayout>(R.id.order_input_layout).visibility = View.GONE
+            return
+        }
+
+        if(findViewById<LinearLayout>(R.id.order_input_layout).visibility == View.VISIBLE) {
             return
         }
 
@@ -173,17 +98,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 radio.text = window.description(this)
                 radio.tag = window.id()
 
-                /*
-                radio.setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(p0: View?) {
-                        for (window in zipInfo.windows) {
-                            if (window.id().contentEquals(radio.tag as String)) {
-                                newOrder.window = window
-                            }
-                        }
-                    }
-                })
-                */
 
                 radio.setPadding(0, 0, 0, 20)
                 radioCount = radioCount + 1
@@ -195,8 +109,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             //New order check
             if(user.order.window.pickupDay == 100) {
+                findViewById<Button>(R.id.cancel_button).visibility = View.GONE
                 return
             }
+            findViewById<Button>(R.id.cancel_button).visibility = View.VISIBLE
+
             findViewById<AutoCompleteTextView>(R.id.zip_in).setText(user.order.zip)
             val checkRadio = radioGroup.findViewWithTag<RadioButton>(user.order.window.id())
             if(checkRadio != null) {
@@ -214,8 +131,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun setupReadView() {
         Log.i("Main", "setUpReadView")
-        fab.setImageDrawable(resources.getDrawable(R.drawable.abc_edit_text_material))
-        fab2.visibility = View.GONE
+
 
         findViewById<TextView>(R.id.pickup_time_view).text = user.order.window.description(this)
         var pauseText = ""
@@ -223,25 +139,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             pauseText = getString(R.string.paused)
         } else {
             pauseText = getString(R.string.next_pickup_is)
-            var beforeOrAfter = org.threeten.bp.LocalDate.now().dayOfWeek.value -
-                    DayOfWeek.values()[user.order.window.pickupDay].value
+            var beforeOrAfter = DayOfWeek.values()[user.order.window.pickupDay].value -
+                    org.threeten.bp.LocalDate.now().dayOfWeek.value
+
+            Log.i("Main", "Today: " + org.threeten.bp.LocalDate.now().dayOfWeek.value +
+                    " Order: " + DayOfWeek.values()[user.order.window.pickupDay].value)
             when(beforeOrAfter) {
                 0 -> pauseText = pauseText + " " + getString(R.string.today)
                 in -7..-1 -> {
                     beforeOrAfter = beforeOrAfter + 7
-                    val calendar = Calendar.getInstance()
-                    val today = org.threeten.bp.LocalDate.now()
-                    calendar.set(today.year, today.monthValue, today.dayOfWeek.value)
-                    calendar.add(Calendar.DATE, beforeOrAfter)
-                    pauseText = pauseText + " " + calendar.get(Calendar.DATE).toShort()
+                    pauseText = pauseText + " " + getString(R.string.`in`) + " " +
+                            beforeOrAfter + " " + (if(beforeOrAfter == 1) getString(R.string.day) else getString(R.string.days))
                 }
                 in 1..7 -> {
-                    val calendar = Calendar.getInstance()
-                    val today = org.threeten.bp.LocalDate.now()
-                    calendar.set(today.year, today.monthValue, today.dayOfWeek.value)
-                    calendar.add(Calendar.DATE, beforeOrAfter)
-                    pauseText = pauseText + " " + calendar.get(Calendar.DATE).toShort()
-
+                    pauseText = pauseText + " " + getString(R.string.`in`) + " " +
+                            beforeOrAfter + " " + (if(beforeOrAfter == 1) getString(R.string.day) else getString(R.string.days))
                 }
             }
 
@@ -249,9 +161,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         }
         findViewById<TextView>(R.id.pause_description).text = pauseText
-        findViewById<TextView>(R.id.address_description).text = user.order.address
+        findViewById<TextView>(R.id.address_description).text = user.order.address + "\n" + user.order.zip
         findViewById<TextView>(R.id.pickup_instructions_description).text = user.order.pickupNotes
-        findViewById<TextView>(R.id.price_description).text = "No price data"
+        findViewById<TextView>(R.id.price_description).text = zipInfo.priceDescription(this)
     }
 
     fun saveOrder(view: View) {
@@ -272,6 +184,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             val userRef = db.getReference("user/" + mAuth.currentUser?.uid + "/order")
             userRef.updateChildren(newOrder.toHashMap())
+            savePaymentSource()
         } else {
             Toast.makeText(this, "Please complete all sections", Toast.LENGTH_SHORT).show()
         }
@@ -279,13 +192,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun validateOrder(order: Order): Boolean {
-        if(order.zip == "" || order.address == "" || order.window.pickupDay == 100) {
+        if(order.zip == "" || order.address == "" || order.window.pickupDay == 100 || user.stripeId == "") {
+            Log.i("MAIN", "Invalid order")
             return false
         }
         return true
     }
 
-    fun toggleMode() {
+    fun toggleMode(view: View) {
         if(editMode) {
 
         }
@@ -321,9 +235,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         window.returnStop = (windowSnapshot.get("drop_off_stop") as Long).toInt()
                         zipInfo.windows.add(window)
                     }
-                    zipInfo.standardPrice = ((dataSnapshot.child("standard_price").value) as Long).toInt()
+                    zipInfo.standardPrice = ((dataSnapshot.child("standard_price").value) as Long).toDouble()
+                    zipInfo.addOnPrice = ((dataSnapshot.child("add_on_price").value) as Long).toDouble()
 
-                    displayOrderInput(true)
+                    setUpUi()
+                    Log.i("Main", "Got ZipInfo")
+                    if(editMode) displayOrderInput(true)
 
                 } else {
                     Toast.makeText(this@MainActivity, "Service not available for this zip code", Toast.LENGTH_SHORT).show()
@@ -339,65 +256,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    fun getUserInfo() {
-        if(mAuth.currentUser == null) {
-            logout()
+    override fun orderIncomplete(boolean: Boolean) {
+        super.orderIncomplete(boolean)
+        editMode = boolean
+        if(zipInfo.zipCode != user.order.zip) {
+            getZipInfo(user.order.zip)
         }
-        val userRef = db.getReference("user/" + mAuth.currentUser?.uid)
-        userRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                if (dataSnapshot != null
-                        && dataSnapshot.exists()
-                        && dataSnapshot.hasChildren()) {
-                    user.emailAddress = dataSnapshot.child("email_address").toString()
-                    user.stripeId = dataSnapshot.child("stripeId").toString()
-
-                    if (dataSnapshot.hasChild("order")) {
-
-
-                        val orderSnapshot = dataSnapshot.child("/order/").value as HashMap<String, Any>
-                        user.order.zip = orderSnapshot.get("zip") as String
-                        user.order.address = orderSnapshot.get("address") as String
-                        user.order.paused = orderSnapshot.get("paused") as Boolean
-                        user.order.pickupNotes = orderSnapshot.get("pickupNotes") as String
-                        if (orderSnapshot.containsKey("window")) {
-                            val windowSnapshot = orderSnapshot.get("window") as HashMap<String, Any>
-                            Log.i("Main", "Window: " + windowSnapshot.toString())
-
-                            user.order.window.pickupDay = (windowSnapshot.get("pickupDay") as Long).toInt()
-                            user.order.window.pickupStart = (windowSnapshot.get("pickupStart") as Long).toInt()
-                            user.order.window.pickupStop = (windowSnapshot.get("pickupStop") as Long).toInt()
-                            user.order.window.returnDay = (windowSnapshot.get("returnDay") as Long).toInt()
-                            user.order.window.returnStart = (windowSnapshot.get("returnStart") as Long).toInt()
-                            user.order.window.returnStop = (windowSnapshot.get("returnStop") as Long).toInt()
-                        } else {
-                            user.order.window = Window()
-                        }
-                    } else {
-                        user.order = Order()
-                    }
-                }
-                if(user.order.window.id() == "100100100100100100") {
-                    editMode = true
-                } else {
-                    editMode = false
-                }
-                setUpUi()
-            }
-
-            override fun onCancelled(p0: DatabaseError) {
-
-            }
-
-            })
-
     }
 
 
     //Edit Order Methods
 
-    fun pauseOrder() {
+    fun pauseOrder(view: View) {
+        val pausedRef = db.getReference("user/" + mAuth.currentUser?.uid + "/order/paused/")
+        pausedRef.setValue(!user.order.paused)
+    }
 
+    fun savePaymentSource() {
+        val mCardInputWidget = findViewById<CardInputWidget>(R.id.card_input_widget)
+        val cardToSave = mCardInputWidget.getCard()
+
+        val stripe = Stripe(this, "pk_test_ngGsAXUpi79PSFkAs2MzOAc1")
+        if(cardToSave == null) {
+            Toast.makeText(this, "Please complete payment information", Toast.LENGTH_SHORT).show()
+        } else {
+
+            stripe.createSource(SourceParams.createCardParams(cardToSave), object : SourceCallback {
+
+                override fun onSuccess(source: Source?) {
+               // override fun onSuccess(source: Source) {
+                    if(source == null) {
+                        Log.i("MAIN", "Source is null")
+                        return
+                    }
+                    val srcIdRef = db.getReference("user/" + mAuth.currentUser?.uid + "/srcId")
+                    srcIdRef.setValue(source.id)
+                    Log.i("Main", "TokenId: " + source.id)
+                    val last4Ref = db.getReference("user/" + mAuth.currentUser?.uid + "/last4")
+                    last4Ref.setValue(cardToSave.last4)
+                    Log.i("Main", "last4: " + cardToSave.last4)
+                }
+
+                override fun onError(error: java.lang.Exception?) {
+                    Log.i("EOC", error.toString())
+                }
+            })
+        }
     }
 }

@@ -338,7 +338,7 @@ import kotlinx.android.synthetic.main.activity_login.*
                             user?.updateProfile(profileUpdates)
 
                             saveUserInfo()
-                            startMainActivity()
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("Login", "createUserWithEmail:failure", task.exception)
@@ -353,11 +353,7 @@ import kotlinx.android.synthetic.main.activity_login.*
         fun saveUserInfo() {
             val username = createAccountView.findViewById<AutoCompleteTextView>(R.id.email_in)
             val name = createAccountView.findViewById<AutoCompleteTextView>(R.id.name_in)
-            /*
-            val streetAddress = createAccountView.findViewById<AutoCompleteTextView>(R.id.address_in)
-            val cityAndState = createAccountView.findViewById<AutoCompleteTextView>(R.id.city_in)
-            val zip = createAccountView.findViewById<AutoCompleteTextView>(R.id.zip_in)
-            */
+
             val phone = createAccountView.findViewById<AutoCompleteTextView>(R.id.phone_in)
 
             val userRef = database.getReference("user/" + mAuth.currentUser?.uid)
@@ -367,7 +363,29 @@ import kotlinx.android.synthetic.main.activity_login.*
             user.name = name.text.toString()
             user.phone = phone.text.toString()
 
+            userRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                    if (dataSnapshot != null
+                            && dataSnapshot.exists()
+                            && dataSnapshot.hasChild("stripeId")) {
+                        Log.i("Login", "User is created")
+                        if(dataSnapshot.child("stripeId").value as String != "") {
+                            Log.i("Login", "User has stripeId")
+                            startMainActivity()
+                        }
+                    }
+                }
+
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+
+            })
+
             userRef.setValue(user)
+
+
         }
 
         fun loginUser() {
