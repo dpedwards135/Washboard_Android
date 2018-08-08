@@ -16,13 +16,33 @@
             android:id="@+id/order_history"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/order_history" />
+        <item
+            android:id="@+id/open_instance_board"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/open_order_instances" />
+        <item
+            android:id="@+id/manual"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/manual" />
+        <item
+            android:id="@+id/provider_schedule"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/schedule" />
+        <item
+            android:id="@+id/provider_support"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/provider_support" />
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/help" />
 
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/provider"
+                android:id="@+id/provider_sign_up"
                 android:icon="@drawable/ic_menu_share"
                 android:title="@string/provider" />
             <item

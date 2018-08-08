@@ -30,4 +30,20 @@
         <include layout="@layout/account_layout"/>
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/provider_signup_container"
+        android:visibility="gone">
+        <include layout="@layout/provider_signup_layout"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/provider_open_orders_container"
+        android:visibility="gone">
+        <include layout="@layout/provider_open_orders_layout"/>
+    </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>

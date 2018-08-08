@@ -38,6 +38,8 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ProviderActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".OpenOrdersActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

@@ -166,4 +166,10 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="account">Account</string>
     <string name="order_history">Order History</string>
     <string name="washboard">Washboard</string>
+    <string name="sign_up_to_be_a_provider">Sign up to be a provider</string>
+    <string name="open_order_instances">Open Orders</string>
+    <string name="help">Help</string>
+    <string name="schedule">Schedule</string>
+    <string name="manual">Manual</string>
+    <string name="provider_support">Provider Support</string>
 </resources>

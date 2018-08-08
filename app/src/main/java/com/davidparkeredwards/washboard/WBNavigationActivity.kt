@@ -110,13 +110,31 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
                 startActivity(activity)
 
             }
-            R.id.provider -> {
+            R.id.provider_sign_up -> {
 
                 val activity = Intent(this, ProviderActivity::class.java)
 
                 startActivity(activity)
+            }
+            R.id.open_instance_board -> {
+                val activity = Intent(this, OpenOrdersActivity::class.java)
+
+                startActivity(activity)
 
             }
+            R.id.manual -> {
+
+            }
+            R.id.provider_schedule -> {
+
+            }
+            R.id.provider_support -> {
+
+            }
+            R.id.help -> {
+
+            }
+
             R.id.logout -> {
 
                 logout()
@@ -170,6 +188,32 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
                     user.phone = dataSnapshot.child("phone").value.toString()
                     user.stripeId = dataSnapshot.child("stripeId").value.toString()
                     user.last4 = dataSnapshot.child("last4").value.toString()
+                    if(dataSnapshot.child("provider").value != null) user.provider = dataSnapshot.child("provider").value as Boolean
+
+                    user.washingAddress = dataSnapshot.child("washingAddress").value.toString()
+                    user.openInstanceIndex = ArrayList<String>()
+                    if(dataSnapshot.hasChild("openInstanceIndex")) {
+                        val instanceSnap = dataSnapshot.child("openInstanceIndex") as HashMap<Long, String>
+                        for(key in instanceSnap.keys) {
+                            user.openInstanceIndex.add(instanceSnap.get(key)!!)
+                        }
+                    }
+                    user.windowsAvailable = ArrayList<Window>()
+                    if(dataSnapshot.hasChild("windowsAvailable")) {
+                        val windowSnap = dataSnapshot.child("windowsAvailable") as HashMap<Long, HashMap<String, Any>>
+                        for (key in windowSnap.keys) {
+                            val xMap = windowSnap.get(key)
+                            if(xMap != null) {
+                                var window = Window()
+                                window.pickupDay = (xMap.get("pickupDay") as Long).toInt()
+                                window.pickupStart = (xMap.get("pickupStart") as Long).toInt()
+                                window.pickupStop = (xMap.get("pickupStop") as Long).toInt()
+                                window.returnDay = (xMap.get("returnDay") as Long).toInt()
+                                window.returnStart = (xMap.get("returnStart") as Long).toInt()
+                                window.returnStop = (xMap.get("returnStop") as Long).toInt()
+                            }
+                        }
+                    }
 
                     if (dataSnapshot.hasChild("order")) {
 
@@ -192,9 +236,12 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
                         } else {
                             user.order.window = Window()
                         }
+
+
                     } else {
                         user.order = Order()
                     }
+
                 }
 
                 ///////////////////////////////
