@@ -17,6 +17,15 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/order_history" />
         <item
+            android:id="@+id/logout"
+            android:icon="@drawable/ic_menu_send"
+            android:title="@string/logout" />
+
+    </group>
+
+    <item android:title="@string/provider_menu">
+        <menu>
+        <item
             android:id="@+id/open_instance_board"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/open_order_instances" />
@@ -37,18 +46,12 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/help" />
 
-    </group>
 
-    <item android:title="Communicate">
-        <menu>
             <item
                 android:id="@+id/provider_sign_up"
                 android:icon="@drawable/ic_menu_share"
                 android:title="@string/provider" />
-            <item
-                android:id="@+id/logout"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/logout" />
+
         </menu>
     </item>
 

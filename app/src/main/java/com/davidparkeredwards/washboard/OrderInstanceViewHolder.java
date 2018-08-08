@@ -1,10 +1,18 @@
 package com.davidparkeredwards.washboard;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     //Try creating base class for WViewHolder that takes a view AND an object reference and whatever happens in
@@ -17,20 +25,32 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
     private View v;
     private RecyclerAdapter adapter;
 
+    /*
+    Layout:
+    Name
+    Address - Nav Button
+    Pickup notes
+    Window
+    Status update button - shows pickup then shows return
+     */
 
 
     private OpenOrdersActivity activity;
+    private int currentStatus;
+    private String instanceId;
 
     //Put all the widgets in here, default "GONE" and set visible if needed.
     private TextView textView;
-    private Button shareTripButton;
-    private Button deleteButton;
+    private Button updateOrderButton;
 
-    public OrderInstanceViewHolder(View v, RecyclerAdapter adapter, OpenOrdersActivity activity) {
+    public OrderInstanceViewHolder(View v, RecyclerAdapter adapter, OpenOrdersActivity activity, int currentStatus, String instanceId) {
         super(v);
         this.v = v;
         this.adapter = adapter;
         this.activity = activity;
+        this.currentStatus = currentStatus;
+        this.instanceId = instanceId;
+
         configureViewHolder();
     }
 
@@ -41,27 +61,13 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
         textView.setText("New Text");
         textView.setOnClickListener(this);
 
-        shareTripButton = (Button) v.findViewById(R.id.Share);
-        shareTripButton.setOnClickListener(new View.OnClickListener(){
+        updateOrderButton = (Button) v.findViewById(R.id.update_button);
+        updateOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("ViewHolder", "ShareTrip Click");
-                
+                updateOrderInstance();
             }
         });
-
-
-
-        deleteButton = (Button) v.findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                
-            }
-        });
-
-
-
 
 
         //v.setOnClickListener(this);
@@ -83,14 +89,74 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
         this.activity = activity;
     }
 
-    public void hideButtons(Boolean hide) {
-        if(hide) {
-            shareTripButton.setVisibility(View.INVISIBLE);
-            deleteButton.setVisibility(View.INVISIBLE);
+    public void updateOrderInstance() {
 
+        AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+        final View updateStatusView = activity.getLayoutInflater().inflate(R.layout.status_update_dialog, null);
+        alert.setView(updateStatusView);
+        alert.setCancelable(true);
+        AlertDialog a = alert.create();
+        a.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        a.show();
+
+        String string = "";
+        switch (currentStatus) {
+            case 0:
+                string = activity.getString(R.string.pickup);
+                break;
+            case 1:
+                string = activity.getString(R.string.dropoff);
+                break;
+            default:
+                string = string;
+        }
+
+        Button updateButton = (Button) updateStatusView.findViewById(R.id.update_button);
+        (updateButton).setText(string);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText bagsText = (EditText) updateStatusView.findViewById(R.id.bag_number);
+                if (bagsText != null) {
+                    if (bagsText.getText() != null) {
+                        Integer bagNumber = Integer.valueOf(bagsText.getText().toString());
+                        if (bagNumber != null) {
+                            activity.updateOrderInstance(instanceId, bagNumber, currentStatus + 1);
+                        }
+
+                    }
+                }
+            }
+        });
+
+        Button noShowButton = (Button) updateStatusView.findViewById(R.id.no_show_button);
+        if (currentStatus != 0) {
+            noShowButton.setVisibility(View.GONE);
         } else {
-            shareTripButton.setVisibility(View.VISIBLE);
-            deleteButton.setVisibility(View.VISIBLE);
+            noShowButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder alert1 = new AlertDialog.Builder(activity);
+                    alert1.setTitle(R.string.is_customer_no_show);
+                    alert1.setMessage(R.string.have_you_checked);
+                    alert1.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            activity.updateOrderInstance(instanceId, 0, 4);
+                        }
+                    });
+                    alert1.setNegativeButton(R.string.cancel, new AlertDialog.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+                    AlertDialog a = alert1.create();
+                    a.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                    a.show();
+
+                }
+            });
         }
     }
 }

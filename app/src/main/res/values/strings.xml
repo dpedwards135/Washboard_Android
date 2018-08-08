@@ -172,4 +172,9 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="schedule">Schedule</string>
     <string name="manual">Manual</string>
     <string name="provider_support">Provider Support</string>
+    <string name="provider_menu">Provider Menu</string>
+    <string name="bag_number"># Bags</string>
+    <string name="no_show_button">No Bags</string>
+    <string name="is_customer_no_show">Are there no bags to pick up?</string>
+    <string name="have_you_checked">Have you done the following? \n1. Reviewed pickup notes\n2. Called the customer</string>
 </resources>

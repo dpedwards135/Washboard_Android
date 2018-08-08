@@ -45,7 +45,7 @@ class OpenOrdersActivity : WBNavigationActivity() {
         }
         for (instanceId in user.openInstanceIndex) {
             val dbref = db.getReference("order_instances")
-            dbref.addListenerForSingleValueEvent(object : ValueEventListener {
+            dbref.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot != null
                             && dataSnapshot.exists()
@@ -58,6 +58,7 @@ class OpenOrdersActivity : WBNavigationActivity() {
                         orderInstance.id = instanceId
                         orderInstance.date = instanceSnap.get("date") as String
                         orderInstance.status = (instanceSnap.get("status") as Long).toInt()
+                        orderInstance.numberOfBags = (instanceSnap.get("numberOfBags") as Long).toInt()
 
                         val orderSnapshot = dataSnapshot.child("/order/").value as HashMap<String, Any>
                         orderInstance.order.zip = orderSnapshot.get("zip") as String
@@ -110,5 +111,13 @@ class OpenOrdersActivity : WBNavigationActivity() {
 
     }
 
-
+    fun updateOrderInstance(instanceId: String, bagNumber: Int?, newStatus: Int) {
+        val dbref = db.getReference("order_instances/" + instanceId)
+        val childMap = HashMap<String, Any>()
+        childMap.put("status", newStatus)
+        if(newStatus == 1) {
+            childMap.put("numberOfBags", bagNumber!!)
+        }
+        dbref.updateChildren(childMap)
+    }
 }
