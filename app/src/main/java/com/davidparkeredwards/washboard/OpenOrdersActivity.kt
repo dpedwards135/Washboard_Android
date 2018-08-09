@@ -58,7 +58,9 @@ class OpenOrdersActivity : WBNavigationActivity() {
                         orderInstance.id = instanceId
                         orderInstance.date = instanceSnap.get("date") as String
                         orderInstance.status = (instanceSnap.get("status") as Long).toInt()
-                        orderInstance.numberOfBags = (instanceSnap.get("numberOfBags") as Long).toInt()
+                        orderInstance.bags = (instanceSnap.get("bags") as ArrayList<String>) //CHECK
+                        orderInstance.customerName = instanceSnap.get("customerName") as String
+                        orderInstance.customerPhone = instanceSnap.get("customerPhone") as String
 
                         val orderSnapshot = dataSnapshot.child("/order/").value as HashMap<String, Any>
                         orderInstance.order.zip = orderSnapshot.get("zip") as String
@@ -111,12 +113,12 @@ class OpenOrdersActivity : WBNavigationActivity() {
 
     }
 
-    fun updateOrderInstance(instanceId: String, bagNumber: Int?, newStatus: Int) {
+    fun updateOrderInstance(instanceId: String, bags: ArrayList<String>, newStatus: Int) {
         val dbref = db.getReference("order_instances/" + instanceId)
         val childMap = HashMap<String, Any>()
         childMap.put("status", newStatus)
         if(newStatus == 1) {
-            childMap.put("numberOfBags", bagNumber!!)
+            childMap.put("bags", bags)
         }
         dbref.updateChildren(childMap)
     }

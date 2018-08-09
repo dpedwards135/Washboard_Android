@@ -8,11 +8,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import java.util.ArrayList;
 
 public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     //Try creating base class for WViewHolder that takes a view AND an object reference and whatever happens in
@@ -36,38 +36,65 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
 
 
     private OpenOrdersActivity activity;
-    private int currentStatus;
-    private String instanceId;
+    private OrderInstance oldOrderInstance;
 
     //Put all the widgets in here, default "GONE" and set visible if needed.
     private TextView textView;
     private Button updateOrderButton;
 
-    public OrderInstanceViewHolder(View v, RecyclerAdapter adapter, OpenOrdersActivity activity, int currentStatus, String instanceId) {
+    private ArrayList<String> newBagList;
+
+    public OrderInstanceViewHolder(View v, RecyclerAdapter adapter, OpenOrdersActivity activity) {
         super(v);
         this.v = v;
         this.adapter = adapter;
         this.activity = activity;
-        this.currentStatus = currentStatus;
-        this.instanceId = instanceId;
 
-        configureViewHolder();
+
+        //configureViewHolder();
     }
 
-    private void configureViewHolder() {
+    public void configureViewHolder(OrderInstance orderInstance) {
+
+        this.oldOrderInstance = orderInstance;
 
         textView = (TextView) v.findViewById(R.id.viewholder_text);
         textView.setVisibility(View.VISIBLE);
-        textView.setText("New Text");
+        String textViewString = (orderInstance.getCustomerName() + "\n" +
+                orderInstance.getOrder().getAddress() +
+                "\n" + orderInstance.getOrder().getZip() + "\n" +
+                orderInstance.getCustomerPhone() + "\n" +
+                orderInstance.getOrder().getPickupNotes() + "\n");
+        if(oldOrderInstance.getStatus() == 1) {
+            String bagString = "";
+            for(String bag : oldOrderInstance.getBags()) {
+                bagString = bagString + bag + "\n";
+            }
+            if(bagString == "") bagString = "0";
+            textViewString = textViewString + activity.getString(R.string.bag_number) + ": " + bagString;
+        }
+        textView.setText(textViewString);
+
         textView.setOnClickListener(this);
 
-        updateOrderButton = (Button) v.findViewById(R.id.update_button);
+
+
+        updateOrderButton = (Button) v.findViewById(R.id.status_change_button);
+        if(oldOrderInstance.getStatus() == 0) {
+            updateOrderButton.setText(R.string.pickup);
+        } else if(oldOrderInstance.getStatus() == 1) {
+            updateOrderButton.setText(R.string.dropoff);
+        } else {
+            updateOrderButton.setText(R.string.error_field_required);
+        }
+
         updateOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 updateOrderInstance();
             }
         });
+
 
 
         //v.setOnClickListener(this);
@@ -95,12 +122,12 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
         final View updateStatusView = activity.getLayoutInflater().inflate(R.layout.status_update_dialog, null);
         alert.setView(updateStatusView);
         alert.setCancelable(true);
-        AlertDialog a = alert.create();
+        final AlertDialog a = alert.show();
         a.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        a.show();
+
 
         String string = "";
-        switch (currentStatus) {
+        switch (oldOrderInstance.getStatus()) {
             case 0:
                 string = activity.getString(R.string.pickup);
                 break;
@@ -110,27 +137,88 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
             default:
                 string = string;
         }
+        newBagList = new ArrayList<String>();
+        final EditText bagsText = (EditText) updateStatusView.findViewById(R.id.bag_number);
 
-        Button updateButton = (Button) updateStatusView.findViewById(R.id.update_button);
-        (updateButton).setText(string);
-        updateButton.setOnClickListener(new View.OnClickListener() {
+        final Button addBagButton = (Button) updateStatusView.findViewById(R.id.save_bag_button);
+        final Button updateButton = (Button) updateStatusView.findViewById(R.id.update_button);
+        final Button noShowButton = (Button) updateStatusView.findViewById(R.id.no_show_button);
+        final Button cancelButton = (Button) updateStatusView.findViewById(R.id.cancel_status_change);
+        final Button clearButton = (Button) updateStatusView.findViewById(R.id.clear_bags_buttons);
+        final TextView bagNumberText = (TextView) updateStatusView.findViewById(R.id.bag_number_text);
+        final ScrollView bagScroll = (ScrollView) updateStatusView.findViewById(R.id.bag_scroll);
+
+        String bagString = "";
+        for(String bag : oldOrderInstance.getBags()) {
+            bagString = bagString + bag + "\n";
+        }
+
+        bagNumberText.setText(activity.getString(R.string.bags_entered) + ": " + bagString);
+
+        clearButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                EditText bagsText = (EditText) updateStatusView.findViewById(R.id.bag_number);
+                newBagList = new ArrayList<String>();
+                String bagString = "";
+                for(String bag : newBagList) {
+                    bagString = bagString + bag + "\n";
+                }
+
+                bagNumberText.setText(activity.getString(R.string.bags_entered) + ": " + bagString);
+            }
+        });
+
+        updateButton.setEnabled(false);
+        addBagButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
                 if (bagsText != null) {
                     if (bagsText.getText() != null) {
-                        Integer bagNumber = Integer.valueOf(bagsText.getText().toString());
-                        if (bagNumber != null) {
-                            activity.updateOrderInstance(instanceId, bagNumber, currentStatus + 1);
+                        String bagId = bagsText.getText().toString();
+                        if (bagId != null && isValidId(bagId)) {
+                            newBagList.add(bagId);
+                            String bagString = "";
+                            for(String bag : newBagList) {
+                                bagString = bagString + bag + "\n";
+                            }
+                            bagNumberText.setText(activity.getString(R.string.bags_entered) + ": " + bagString);
+                            bagsText.setText("");
+                            bagScroll.post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    bagScroll.fullScroll(ScrollView.FOCUS_DOWN);
+                                }
+                            });
+                            if(oldOrderInstance.getStatus() == 1) {
+                                if (newBagList.equals(oldOrderInstance.getBags())) {
+                                    updateButton.setEnabled(true);
+                                }
+                            } else {
+
+                                updateButton.setEnabled(true);
+                            }
+                        } else {
+                            Toast.makeText(activity, R.string.valid_bag_id_not_found, Toast.LENGTH_LONG).show();
                         }
 
                     }
                 }
+        }});
+
+
+        updateButton.setText(string);
+        updateButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(oldOrderInstance.getStatus() == 0) {
+                    activity.updateOrderInstance(oldOrderInstance.getId(), newBagList, oldOrderInstance.getStatus() + 1);
+                }
             }
         });
 
-        Button noShowButton = (Button) updateStatusView.findViewById(R.id.no_show_button);
-        if (currentStatus != 0) {
+
+        if (oldOrderInstance.getStatus() != 0) {
             noShowButton.setVisibility(View.GONE);
         } else {
             noShowButton.setOnClickListener(new View.OnClickListener() {
@@ -142,10 +230,10 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
                     alert1.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.updateOrderInstance(instanceId, 0, 4);
+                            activity.updateOrderInstance(oldOrderInstance.getId(), new ArrayList<String>(), 4);
                         }
                     });
-                    alert1.setNegativeButton(R.string.cancel, new AlertDialog.OnClickListener() {
+                    alert1.setNegativeButton(R.string.no, new AlertDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             dialogInterface.cancel();
@@ -157,6 +245,35 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
 
                 }
             });
+
+
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("ViewHolder", "Dismiss view");
+                    a.dismiss();
+                }
+            });
+
         }
     }
+
+    private boolean isValidId(String string) {
+
+        if(!string.contains("WB") || !(string.length() == 9)) return false;
+        if(newBagList.contains(string)) return false;
+
+        if(oldOrderInstance.getStatus() == 1) {
+            if (oldOrderInstance.getBags().contains(string)){
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+
 }

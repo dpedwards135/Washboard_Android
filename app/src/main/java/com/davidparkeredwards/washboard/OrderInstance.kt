@@ -9,8 +9,10 @@ class OrderInstance {
     var id = ""
     var order = Order()
     var date = ""
+    var customerName = ""
+    var customerPhone = ""
     var status = 100 //0 = Open, 1 = Picked up, 2 = Returned, 3 = Closed, 4 = No Show, 100 = Invalid
-    var numberOfBags = 0
+    var bags = ArrayList<String>()
 
     fun date() : LocalDate? {
         if(date != "") {

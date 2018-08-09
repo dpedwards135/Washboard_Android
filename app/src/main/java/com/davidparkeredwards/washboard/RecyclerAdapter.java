@@ -76,7 +76,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         OrderInstance item = orderList.get(position);
         OrderInstanceViewHolder viewHolder = (OrderInstanceViewHolder) holder;
-        viewHolder.setTripName(item.getId());
+        viewHolder.configureViewHolder(orderList.get(position));
+
 
     }
 

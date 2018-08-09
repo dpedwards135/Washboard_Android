@@ -177,4 +177,8 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="no_show_button">No Bags</string>
     <string name="is_customer_no_show">Are there no bags to pick up?</string>
     <string name="have_you_checked">Have you done the following? \n1. Reviewed pickup notes\n2. Called the customer</string>
+    <string name="valid_bag_id_not_found">Valid bag id not found. Please try again.</string>
+    <string name="bags_entered">Bags entered</string>
+    <string name="clear_bags">Clear</string>
+    <string name="no">No</string>
 </resources>
