@@ -22,6 +22,7 @@ import android.view.inputmethod.EditorInfo
 import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
 import android.content.Intent
+import android.support.annotation.NonNull
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.WindowManager
@@ -32,6 +33,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -344,6 +347,9 @@ import kotlinx.android.synthetic.main.activity_login.*
                             Log.w("Login", "createUserWithEmail:failure", task.exception)
                             Toast.makeText(this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show()
+                            var message = getString(R.string.unable_to_create_new_user)
+                            if(task.exception != null) message = task.exception!!.localizedMessage
+                            WBErrorHandler(this, getString(R.string.error), message).show()
                         }
                     }
 
@@ -358,32 +364,50 @@ import kotlinx.android.synthetic.main.activity_login.*
 
             val userRef = database.getReference("user/" + mAuth.currentUser?.uid)
 
-            val user = User()
-            user.emailAddress = username.text.toString()
-            user.name = name.text.toString()
-            user.phone = phone.text.toString()
+
+
+
 
             userRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                     if (dataSnapshot != null
                             && dataSnapshot.exists()
-                            && dataSnapshot.hasChild("stripeId")) {
+                            && dataSnapshot.hasChild("emailAddress")) {
                         Log.i("Login", "User is created")
-                        if(dataSnapshot.child("stripeId").value as String != "") {
-                            Log.i("Login", "User has stripeId")
-                            startMainActivity()
-                        }
+                        startMainActivity()
                     }
                 }
 
                 override fun onCancelled(p0: DatabaseError) {
+                    if(p0.code != null) WBErrorHandler(this@LoginActivity,
+                            "Error: " + p0.code.toString(), p0.message)
 
                 }
 
             })
 
-            userRef.setValue(user)
+            val user = User()
+            user.emailAddress = username.text.toString()
+            user.name = name.text.toString()
+            user.phone = phone.text.toString()
+
+            FirebaseInstanceId.getInstance().instanceId.
+                    addOnCompleteListener(object: OnCompleteListener<InstanceIdResult> {
+                        override fun onComplete(p0: Task<InstanceIdResult>) {
+                            if(!p0.isSuccessful) {
+                                Log.i("Create User", "getInstanceId failed")
+                                return
+                            }
+
+                            val token = p0.getResult().token
+                            user.firebaseToken = token
+                            userRef.setValue(user)
+                        }
+
+                    })
+
+
 
 
         }
@@ -403,9 +427,9 @@ import kotlinx.android.synthetic.main.activity_login.*
                             startMainActivity()
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w("Login", "signInWithEmail:failure", task.exception)
-                            Toast.makeText(this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show()
+                            var message = getString(R.string.unable_to_sign_in)
+                            if(task.exception != null) message = task.exception!!.localizedMessage
+                            WBErrorHandler(this, getString(R.string.error), message).show()
                         }
 
                         // ...
@@ -422,13 +446,16 @@ import kotlinx.android.synthetic.main.activity_login.*
                             && dataSnapshot.hasChildren()) {
                         startMainActivity()
                     } else {
-                        Toast.makeText(this@LoginActivity, "User not found", Toast.LENGTH_SHORT).show()
+                        WBErrorHandler(this@LoginActivity, getString(R.string.error),
+                                getString(R.string.user_not_found)).show()
                     }
                 }
 
 
                 override fun onCancelled(p0: DatabaseError) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+                    WBErrorHandler(this@LoginActivity, getString(R.string.error),
+                            getString(R.string.user_not_found)).show()
                 }
             })
         }
@@ -444,14 +471,6 @@ import kotlinx.android.synthetic.main.activity_login.*
             startActivity(mainActivity)
         }
 
-        /*
-        fun startSetup() {
-            Crashlytics.setUserIdentifier("User: " + mAuth.currentUser?.uid)
-            Crashlytics.log("Start Setup")
-            val setupActivity = Intent(this, SetupActivity::class.java)
-            startActivity(setupActivity)
-        }
-        */
 
         fun resetPassword() {
             var alert = AlertDialog.Builder(this)
@@ -471,10 +490,13 @@ import kotlinx.android.synthetic.main.activity_login.*
                 mAuth.sendPasswordResetEmail(emailAddress).addOnCompleteListener(object : OnCompleteListener<Void> {
                     override fun onComplete(p0: Task<Void>) {
                         if (p0.isSuccessful) {
-                            Toast.makeText(this@LoginActivity, getString(R.string.reset_email_sent), Toast.LENGTH_SHORT).show()
                             a.dismiss()
+                            WBErrorHandler(this@LoginActivity, getString(R.string.reset_email_sent),
+                                    "").show()
+
                         } else {
-                            Toast.makeText(this@LoginActivity, getString(R.string.account_not_found), Toast.LENGTH_LONG).show()
+                            WBErrorHandler(this@LoginActivity, getString(R.string.error),
+                                    getString(R.string.account_not_found)).show()
                         }
                     }
                 })

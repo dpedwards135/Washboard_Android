@@ -8,11 +8,13 @@ class User {
     var order = Order()
     var stripeId = ""
     var last4 = ""
+    var firebaseToken = ""
     //Provider Info
     var provider = false
     var washingAddress = ""
     var windowsAvailable = ArrayList<Window>()
-    var openInstanceIndex = ArrayList<String>()
+    var orderInstanceIndex = HashMap<String, Int>()
+
 
     /*
     - Washing address

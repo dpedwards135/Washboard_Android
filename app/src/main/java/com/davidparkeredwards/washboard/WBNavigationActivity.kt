@@ -16,6 +16,9 @@ import android.view.View
 import android.widget.*
 import com.crashlytics.android.Crashlytics
 import com.davidparkeredwards.washboard.R.string.orders
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -34,6 +37,7 @@ import kotlinx.android.synthetic.main.read_order_layout.*
 import org.threeten.bp.DayOfWeek
 import java.time.LocalDate
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -51,6 +55,8 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        googlePlayServicesAvailable()
+
         getUserInfo()
 
         val toggle = ActionBarDrawerToggle(
@@ -59,6 +65,11 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+    }
+
+    override fun onResume() {
+        googlePlayServicesAvailable()
+        super.onResume()
     }
 
     override fun onBackPressed() {
@@ -191,11 +202,15 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
                     if(dataSnapshot.child("provider").value != null) user.provider = dataSnapshot.child("provider").value as Boolean
 
                     user.washingAddress = dataSnapshot.child("washingAddress").value.toString()
-                    user.openInstanceIndex = ArrayList<String>()
-                    if(dataSnapshot.hasChild("openInstanceIndex")) {
-                        val instanceSnap = dataSnapshot.child("openInstanceIndex") as HashMap<Long, String>
-                        for(key in instanceSnap.keys) {
-                            user.openInstanceIndex.add(instanceSnap.get(key)!!)
+                    user.orderInstanceIndex = HashMap<String, Int>()
+                    if(dataSnapshot.hasChild("orderInstanceIndex")) {
+                        val instanceSnap = dataSnapshot.child("orderInstanceIndex").value as HashMap<Any, Long>
+                        for(orderInstanceIndexKey in instanceSnap.keys) {
+                            Log.i("WBNA", "Order Instance: " + instanceSnap.toString())
+                            val orderInstanceOpenClosed = instanceSnap.get(orderInstanceIndexKey)
+                            Log.i("WBNA", "Order Instance 2: " + orderInstanceOpenClosed)
+
+                            user.orderInstanceIndex.put(orderInstanceIndexKey as String, orderInstanceOpenClosed!!.toInt())
                         }
                     }
                     user.windowsAvailable = ArrayList<Window>()
@@ -270,6 +285,18 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
 
     open fun orderIncomplete(boolean: Boolean) {
         Log.i("WBNA", "Order is not complete: " + boolean)
+    }
+
+    fun googlePlayServicesAvailable() : Boolean{
+        val googleApiAvailability = GoogleApiAvailability.getInstance()
+        val status = googleApiAvailability.isGooglePlayServicesAvailable(this)
+        if(ConnectionResult.SUCCESS != status) {
+            if(googleApiAvailability.isUserResolvableError(status)) {
+                googleApiAvailability.getErrorDialog(this, status, 2404).show();
+            }
+            return false;
+        }
+        return true
     }
 
 

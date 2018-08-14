@@ -181,4 +181,8 @@ All laundry not set aside as delicate or hang dry will be dried on medium heat t
     <string name="bags_entered">Bags entered</string>
     <string name="clear_bags">Clear</string>
     <string name="no">No</string>
+    <string name="error">Error</string>
+    <string name="unable_to_create_new_user">Unable to create new user.</string>
+    <string name="unable_to_sign_in">Unable to sign in.</string>
+    <string name="user_not_found">User not found.</string>
 </resources>

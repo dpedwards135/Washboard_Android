@@ -80,9 +80,9 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
 
 
         updateOrderButton = (Button) v.findViewById(R.id.status_change_button);
-        if(oldOrderInstance.getStatus() == 0) {
+        if(oldOrderInstance.getStatus() < 20) {
             updateOrderButton.setText(R.string.pickup);
-        } else if(oldOrderInstance.getStatus() == 1) {
+        } else if(oldOrderInstance.getStatus() > 19) {
             updateOrderButton.setText(R.string.dropoff);
         } else {
             updateOrderButton.setText(R.string.error_field_required);
@@ -127,16 +127,12 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
 
 
         String string = "";
-        switch (oldOrderInstance.getStatus()) {
-            case 0:
-                string = activity.getString(R.string.pickup);
-                break;
-            case 1:
-                string = activity.getString(R.string.dropoff);
-                break;
-            default:
-                string = string;
+        if(oldOrderInstance.getStatus() > 19) {
+            string = activity.getString(R.string.dropoff);
+        } else {
+            string = activity.getString(R.string.pickup);
         }
+
         newBagList = new ArrayList<String>();
         final EditText bagsText = (EditText) updateStatusView.findViewById(R.id.bag_number);
 
@@ -211,9 +207,16 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
         updateButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(oldOrderInstance.getStatus() == 0) {
-                    activity.updateOrderInstance(oldOrderInstance.getId(), newBagList, oldOrderInstance.getStatus() + 1);
+                int status = 0;
+                if(oldOrderInstance.getStatus() > 19) {
+                    status = 30;
+                } else {
+                    status = 20;
                 }
+                activity.updateOrderInstance(oldOrderInstance.getId(), newBagList, status);
+                a.dismiss();
+
+
             }
         });
 
@@ -230,7 +233,7 @@ public class OrderInstanceViewHolder extends RecyclerView.ViewHolder implements 
                     alert1.setPositiveButton(R.string.yes, new AlertDialog.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.updateOrderInstance(oldOrderInstance.getId(), new ArrayList<String>(), 4);
+                            activity.updateOrderInstance(oldOrderInstance.getId(), new ArrayList<String>(), 19);
                         }
                     });
                     alert1.setNegativeButton(R.string.no, new AlertDialog.OnClickListener() {

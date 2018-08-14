@@ -31,10 +31,10 @@ class OpenOrdersActivity : WBNavigationActivity() {
     }
 
     fun getOpenOrders() {
+        list = ArrayList<OrderInstance>()
 
-        list = ArrayList<OrderInstance>() //Change to <OrderInstance> which will be an immutable copy of Order, plus a date
-
-        if(user.openInstanceIndex.isEmpty()) {
+        /*
+        if(user.orderInstanceIndex.isEmpty()) {
             var orderInstance = OrderInstance()
             orderInstance.order = user.order
             orderInstance.date = "This Date"
@@ -43,9 +43,14 @@ class OpenOrdersActivity : WBNavigationActivity() {
             list.add(orderInstance)
             if(recyclerAdapter != null) recyclerAdapter!!.notifyDataSetChanged()
         }
-        for (instanceId in user.openInstanceIndex) {
+        */
+        for (key in user.orderInstanceIndex.keys) {
+
+            if(user.orderInstanceIndex.get(key) == 0) continue
+            val instanceId = key
+            Log.i("OOA", "instanceId: " + instanceId)
             val dbref = db.getReference("order_instances")
-            dbref.addValueEventListener(object : ValueEventListener {
+            dbref.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot != null
                             && dataSnapshot.exists()
@@ -58,11 +63,11 @@ class OpenOrdersActivity : WBNavigationActivity() {
                         orderInstance.id = instanceId
                         orderInstance.date = instanceSnap.get("date") as String
                         orderInstance.status = (instanceSnap.get("status") as Long).toInt()
-                        orderInstance.bags = (instanceSnap.get("bags") as ArrayList<String>) //CHECK
+                        if(instanceSnap.get("bags") != null) orderInstance.bags = (instanceSnap.get("bags") as ArrayList<String>) //CHECK
                         orderInstance.customerName = instanceSnap.get("customerName") as String
                         orderInstance.customerPhone = instanceSnap.get("customerPhone") as String
 
-                        val orderSnapshot = dataSnapshot.child("/order/").value as HashMap<String, Any>
+                        val orderSnapshot = instanceSnap.get("order") as HashMap<String, Any>
                         orderInstance.order.zip = orderSnapshot.get("zip") as String
                         orderInstance.order.address = orderSnapshot.get("address") as String
                         orderInstance.order.paused = orderSnapshot.get("paused") as Boolean
@@ -78,6 +83,7 @@ class OpenOrdersActivity : WBNavigationActivity() {
                             orderInstance.order.window.returnStart = (windowSnapshot.get("returnStart") as Long).toInt()
                             orderInstance.order.window.returnStop = (windowSnapshot.get("returnStop") as Long).toInt()
                         }
+
                         list.add(orderInstance)
 
                         if(recyclerAdapter != null) recyclerAdapter!!.notifyDataSetChanged()
@@ -114,12 +120,14 @@ class OpenOrdersActivity : WBNavigationActivity() {
     }
 
     fun updateOrderInstance(instanceId: String, bags: ArrayList<String>, newStatus: Int) {
+        Log.i("OOA", "updateOrder: " + instanceId + newStatus);
         val dbref = db.getReference("order_instances/" + instanceId)
         val childMap = HashMap<String, Any>()
         childMap.put("status", newStatus)
-        if(newStatus == 1) {
+        if(newStatus < 20) {
             childMap.put("bags", bags)
         }
         dbref.updateChildren(childMap)
+        getOpenOrders()
     }
 }
