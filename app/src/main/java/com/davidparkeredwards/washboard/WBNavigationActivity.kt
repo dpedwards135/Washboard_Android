@@ -157,8 +157,12 @@ open class WBNavigationActivity : AppCompatActivity(), NavigationView.OnNavigati
     }
 
     fun logout() {
+
+        val loggedInRef = db.getReference("user/" + mAuth.currentUser?.uid + "/loggedIn")
+        loggedInRef.setValue(false)
         var auth = FirebaseAuth.getInstance()
         auth.signOut()
+
 
         val intent = Intent(this, LoginActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)

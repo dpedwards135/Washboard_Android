@@ -1,10 +1,15 @@
 package com.davidparkeredwards.washboard
 
+import android.app.Notification
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.support.v4.app.NotificationCompat
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
@@ -56,16 +61,29 @@ class MessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(p0: RemoteMessage?) {
-        Log.i("MessagingService", "Message received " + p0!!.notification.toString())
-        if(p0 != null && p0.notification != null && p0.notification!!.body != null)
-        //
-           Handler(Looper.getMainLooper()).post(Runnable() {
+        Log.i("MessagingService", "Message received ")
 
-               run {
-                   Toast.makeText(this@MessagingService, "Show the message", Toast.LENGTH_SHORT).show()
-                   //WBErrorHandler(this, "Message", p0.notification!!.body!!).show()
-               }
+        if(p0 == null && p0?.notification == null) return
 
-           })
+
+
+        val message = p0.notification?.body ?: "Blank body"
+        val title = p0.notification?.title ?: "Blank Title"
+
+        val notificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val intent = PendingIntent.getActivity(this, 0,
+                Intent(this, MainActivity::class.java), 0)
+        val builder = NotificationCompat.Builder(this)
+                .setContentTitle(title)
+                .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(message))
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setVibrate(longArrayOf(1000, 1000))
+                .setAutoCancel(true)
+
+        builder.setContentIntent(intent)
+        notificationManager.notify(1, builder.build())
     }
 }

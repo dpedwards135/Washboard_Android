@@ -462,6 +462,8 @@ import kotlinx.android.synthetic.main.activity_login.*
 
         fun startMainActivity() {
 
+            val loggedInRef = database.getReference("user/" + mAuth.currentUser?.uid + "/loggedIn")
+            loggedInRef.setValue(true)
 
             Crashlytics.setUserIdentifier("User: " + mAuth.currentUser?.uid)
             Crashlytics.log("Start Main Activity")
